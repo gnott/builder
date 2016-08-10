@@ -1,3 +1,4 @@
+from distutils.util import strtobool
 from fabric.api import task, local, cd, settings, run, sudo, put, get, abort
 from fabric.contrib import files
 from fabric.contrib.console import confirm
@@ -140,11 +141,12 @@ def owner_ssh(stackname):
         
 @task
 @requires_aws_stack
-def download_file(stackname, path, destination):
+def download_file(stackname, path, destination, use_bootstrap_user=False):
     fname = os.path.basename(path)
-    utils.mkdirp(destination)
-    with stack_conn(stackname):
+    utils.mkdirp(destination),
+    with stack_conn(stackname, username=_user(use_bootstrap_user)):
         get(path, destination, use_sudo=True)
+
 
 @task
 @requires_aws_stack
@@ -159,6 +161,12 @@ def upload_file(stackname, local_path, remote_path, overwrite=False):
             print 'remote file exists, not overwriting'
             exit(1)
         put(local_path, remote_path)
+
+def _user(use_bootstrap_user):
+    if bool(strtobool(use_bootstrap_user)):
+        return BOOTSTRAP_USER
+    else:
+        return DEPLOY_USER
 
 #
 # these might need a better home
