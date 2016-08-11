@@ -68,7 +68,7 @@ def create_stack(pname):
 def create_update(stackname):
     if not core.stack_is_active(stackname):
         print 'stack does not exist, creating'
-        bootstrap.create_stack(stackname)
+        bootstrap.create_ec2_stack(stackname)
     print 'updating stack'
     bootstrap.update_stack(stackname)
     return stackname
