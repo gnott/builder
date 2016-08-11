@@ -1,10 +1,7 @@
-from fabric.api import task, local, cd, settings, run, sudo, put, get, abort
+from fabric.api import task, local, settings, run, sudo, put, get, abort
 from fabric.contrib import files
-from fabric.contrib.console import confirm
 import aws, utils
 from decorators import requires_project, requires_aws_stack, requires_steady_stack, echo_output, setdefault, debugtask
-import os
-from os.path import join
 from buildercore import core, cfngen, utils as core_utils, bootstrap, project, checks
 from buildercore.core import stack_conn, stack_pem
 from buildercore.config import DEPLOY_USER, BOOTSTRAP_USER
@@ -141,7 +138,6 @@ def owner_ssh(stackname):
 @task
 @requires_aws_stack
 def download_file(stackname, path, destination):
-    fname = os.path.basename(path)
     utils.mkdirp(destination)
     with stack_conn(stackname):
         get(path, destination, use_sudo=True)
@@ -177,8 +173,8 @@ def cmd(stackname, command=None):
 def project_list():
     for org, plist in project.org_project_map().items():
         print org
-        for p in plist:
-            print '  ',p
+        for project_name in plist:
+            print '  ', project_name
         print 
 
 @task
